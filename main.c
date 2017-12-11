@@ -5,11 +5,23 @@
 #define VERSION "0.0.1.1012 alpha"
 
 #define LIM 1000
+
+#ifdef __WINNT__
+    #define AA "Windows"
+#elif __linux__
+    #define AA "Linux"
+#else
+    #define AA "Not detected"
+#endif
+
+
 void init_loop();
 void yesh_arrio();
 int builtin();
 
 int k=1;
+
+char *os;
 
 const char ver[]=VERSION, space[2]=" ", usr_nam[]="user";
 char /*usr_nam[20]="user",*/ line[LIM], *tocken, **args, *usr;
@@ -24,7 +36,8 @@ char *command, *arg0, *arg1, *arg2, *arg3, *arg4;
 
 int main(int argc, char *argv[])
 {
-    printf("Yesh <version %s>\nCopyright (C) Artyom Yeghoyan\n\n", ver);
+    os=AA;
+    printf("Yesh <version %s> for %s\nCopyright (C) Artyom Yeghoyan\n\n", ver, os);
     init_loop();
     return 1;
 }

@@ -2,29 +2,66 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define VERSION "0.0.1.1012 alpha"
+#define VERSION "0.0.2.1412 alpha"
+#define V "0.0.2"
 
 #define LIM 1000
 
-#ifdef __WINNT__
-    #define AA "Windows"
+#ifdef __WIN32__
+    #define OS "Windows"
+    #include <windows.h>
+    #include <tchar.h>
 #elif __linux__
-    #define AA "Linux"
-#else
-    #define AA "Not detected"
-#endif
+    #define OS "Linux"
+    #include <unistd.h>
+    #include <sys/wait.h>
+    #include <sys/types.h>
+    int yesh_UNIX_appstart(/*char **args*/)
+    {
+    pid_t pid, wpid;
+    int status;
 
+    pid = fork();
+    /* if (pid == 0) {*/
+        /* Child process */
+    /* if (execvp(args[0], args) == -1) {
+        perror("lsh");
+        }
+        exit(EXIT_FAILURE);
+    } else if (pid < 0) {*/
+        /* Error forking */
+    /* perror("lsh");
+    } else {*/
+        /* Parent process */
+        do {
+        wpid = waitpid(pid, &status, WUNTRACED);
+        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+    /*}*/
+
+    return 1;
+    }
+#elif __MACH__
+    #define OS "macOS"
+    #include <unistd.h>
+    #include <sys/wait.h>
+#else
+    #define OS "Not detected"
+#endif
 
 void init_loop();
 void yesh_arrio();
 int builtin();
 
+void yesh_win_appstart(TCHAR *appname); /*Windows process handling*/
+
 int k=1;
+
+/*char **com = malloc(50 * sizeof(char*));*/
 
 char *os;
 
 const char ver[]=VERSION, space[2]=" ", usr_nam[]="user";
-char /*usr_nam[20]="user",*/ line[LIM], *tocken, **args, *usr;
+char /*usr_nam[20]="user",*/ line[LIM], *tocken, /*args,*/ *usr;
 
 char *command, *arg0, *arg1, *arg2, *arg3, *arg4;
 
@@ -34,9 +71,34 @@ char *command, *arg0, *arg1, *arg2, *arg3, *arg4;
     usr=arg0;
 }*/
 
+/*int lsh_launch(char **args)
+{
+  pid_t pid, wpid;
+  int status;
+
+  pid = fork();
+  if (pid == 0) {
+
+    if (execvp(args[0], args) == -1) {
+      perror("lsh");
+    }
+    exit(EXIT_FAILURE);
+  } else if (pid < 0) {
+
+    perror("lsh");
+  } else {
+
+    do {
+      wpid = waitpid(pid, &status, WUNTRACED);
+    } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+  }
+
+  return 1;
+}*/
+
 int main(int argc, char *argv[])
 {
-    os=AA;
+    os=OS;
     printf("Yesh <version %s> for %s\nCopyright (C) Artyom Yeghoyan\n\n", ver, os);
     init_loop();
     return 1;
@@ -70,7 +132,7 @@ void yesh_arrio()
     i=1;
     command=strtok(line, space);
     tocken=command;
-    /*printf("%s\n", command);*/
+    /*args[0]=command;*/
     while(tocken!=NULL&&i<7)
     {
         switch (i)
@@ -95,14 +157,14 @@ int builtin()
     } else
     if (!strcmp(command, "help")) /*Help handling*/
     {
-        printf("AA      AA AAAAAAAAAA     AAA    AA      AA \n AA    AA  AA       A   AA   AA  AA      AA \n  AA  AA   AA          AA     AA AA      AA \n   AAAA    AAAAAAAAAA   AAA      AAAAAAAAAA \n    AA     AA             AAAA   AA      AA \n   AA      AA       A         AA AA      AA \n  AA       AAAAAAAAAA  AA    AA  AA      AA \n AA                      AAAA\n\n");
+        printf("AA                            AA ##########    ####    ###    ###\nAAAA                        AAAA  ##      #  ##    ##   ##    ##\nAA  AA                    AA  AA  ##         ##         ##    ##\nAA    AA                AA    AA  #########    #####    ########\nAA      AA            AA      AA  ##               ##   ##    ##\nAA        AAAA    AAAA        AA  ##      #  ##    ##   ##    ##\n AA           AAAA           AA  ##########    ####    ###    ###\n  AA        AAAA  YEGHOYAN  AA\n   AA     AAA       SHELL  AA\n    AA AAA        %s   AA\n     AA                  AA\n      AAA              AAA\n        AAA          AAA\n          AAAA     AAAA\n            AAAAAAAAA\n              AAAA\n               AA\n\n", V);
         printf("v %s\nlegal commands:\n\n", ver);
         printf("exit\nhelp\nyesh OR about\ntell arg0 TO PRINT OUT arg0\nls -l\n");
         return 1;
     } else
     if ((!strcmp(command, "yesh"))||(!strcmp(command, "about")))
     {
-        printf("AA      AA AAAAAAAAAA     AAA    AA      AA \n AA    AA  AA       A   AA   AA  AA      AA \n  AA  AA   AA          AA     AA AA      AA \n   AAAA    AAAAAAAAAA   AAA      AAAAAAAAAA \n    AA     AA             AAAA   AA      AA \n   AA      AA       A         AA AA      AA \n  AA       AAAAAAAAAA  AA    AA  AA      AA \n AA                      AAAA\n\n");
+        printf("AA                            AA ##########    ####    ###    ###\nAAAA                        AAAA  ##      #  ##    ##   ##    ##\nAA  AA                    AA  AA  ##         ##         ##    ##\nAA    AA                AA    AA  #########    #####    ########\nAA      AA            AA      AA  ##               ##   ##    ##\nAA        AAAA    AAAA        AA  ##      #  ##    ##   ##    ##\n AA           AAAA           AA  ##########    ####    ###    ###\n  AA        AAAA  YEGHOYAN  AA\n   AA     AAA       SHELL  AA\n    AA AAA        %s   AA\n     AA                  AA\n      AAA              AAA\n        AAA          AAA\n          AAAA     AAAA\n            AAAAAAAAA\n              AAAA\n               AA\n\n", V);
         printf("Yesh <version %s>\nCopyright (C) Artyom Yeghoyan\n\n", ver);
         return 1;
     } else
@@ -120,6 +182,51 @@ int builtin()
     {
         printf("%s\n", arg0);
         return 1;
+    } else
+    {
+        if (!strcmp(os, "Windows"))
+            yesh_win_appstart(command);
+        return 1;
     }
     return 0;
 }
+void yesh_win_appstart(TCHAR *appname)
+    {
+        STARTUPINFO si;
+        PROCESS_INFORMATION pi;
+
+        ZeroMemory( &si, sizeof(si) );
+        si.cb = sizeof(si);
+        ZeroMemory( &pi, sizeof(pi) );
+
+        /*if( argc != 2 )
+        {
+            printf("Usage: %s [cmdline]\n", argv[0]);
+            return;
+        }*/
+
+        /* Start the child process. */
+        if( !CreateProcess( NULL,   /* No module name (use command line) */
+            appname,        /* Command line */
+            NULL,           /* Process handle not inheritable */
+            NULL,           /* Thread handle not inheritable */
+            FALSE,          /* Set handle inheritance to FALSE */
+            0,              /* No creation flags */
+            NULL,           /* Use parent's environment block */
+            NULL,           /* Use parent's starting directory */
+            &si,            /* Pointer to STARTUPINFO structure */
+            &pi )           /* Pointer to PROCESS_INFORMATION structure */
+        )
+        {
+            printf("CreateProcess failed (%d).\n", GetLastError());
+            return;
+        }
+
+        /* Wait until child process exits. */
+        WaitForSingleObject( pi.hProcess, INFINITE );
+
+        /* Close process and thread handles. */
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+        return;
+    }
